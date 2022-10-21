@@ -1,3 +1,4 @@
+import string
 from sqlalchemy import create_engine
 import psycopg2
 import pandas as pd
@@ -7,16 +8,23 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-#PASSWORD = os.environ["PG_PASSWORD"]
 
-dfx = pd.read_csv("air_quality_bogota/data/stations_loc.csv") # dim stations
-# engine = create_engine(f'postgresql+psycopg2://postgres:{PASSWORD}@localhost:5432/airQuality')
+# se define la conexion y la dirección de la base de datos que se desea acceder
 engine = create_engine('postgresql+psycopg2://root:root@127.0.0.1:5432/airQuality')
 
-def new_model(df, name_model):
+
+def new_model(df, name_model) -> None:
+    """
+    funcion encargada de crear un nuevo modelo en la base de datos 
+    a partir de un cliente.
+
+    df: Dataframe que contiene los datos que se llevara a la base de datos.
+    name_model: string que contiene el nombre de la tabla que se va a crear.
+    """
+
     df = df.rename_axis('id').reset_index()
     df['id'] = df.index+1
-    df.head(0).to_sql(name_model, engine, if_exists='replace', index=False) #drops old table and creates new empty table
+    df.head(0).to_sql(name_model, engine, if_exists='replace', index=False)
 
 
     conn = engine.raw_connection()
@@ -25,7 +33,5 @@ def new_model(df, name_model):
     df.to_csv(output, sep='\t', header=False, index=False)
     output.seek(0)
     contents = output.getvalue()
-    cur.copy_from(output, name_model, null="") # null values become ''
+    cur.copy_from(output, name_model, null="")
     conn.commit()
-
-#new_model(dfx, "testx")

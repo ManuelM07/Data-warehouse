@@ -1,8 +1,10 @@
 version: '3.8'
 services:
+
   db:
-    container_name: pg_container
+    container_name: postgres
     image: postgres
+    hostname: postgres
     restart: always
     environment:
       POSTGRES_USER: root
@@ -10,8 +12,9 @@ services:
       POSTGRES_DB: airQuality
     ports:
       - "5432:5432"
+
   pgadmin:
-    container_name: pgadmin4_container
+    container_name: pgadmin4
     image: dpage/pgadmin4
     restart: always
     environment:
@@ -19,3 +22,12 @@ services:
       PGADMIN_DEFAULT_PASSWORD: root
     ports:
       - "5050:80"
+
+  datascience-notebook:
+    container_name:   jupyter_notebook
+    image:    jupyter/datascience-notebook
+    volumes:
+      - /
+    ports:
+      - 8888:8888 
+    
